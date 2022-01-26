@@ -8,7 +8,7 @@ const base = createTheme({
     }
   },
   shape: {
-    borderRadius: 20,
+    borderRadius: 10,
   },
   typography: {
     fontFamily: 'Sora',
