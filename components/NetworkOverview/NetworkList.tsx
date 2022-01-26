@@ -2,7 +2,7 @@ import React from 'react';
 import { get, getDatabase, onValue, orderByChild, query, ref } from "firebase/database";
 import { getAuth } from 'firebase/auth';
 import NetworkCard, { NetworkSnapshot } from './NetworkCard';
-import { Grid } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 
 export default function NetworkList() {
   const [networkSnapshots, setNetworkSnapshots] = React.useState<Array<NetworkSnapshot>>([]);
@@ -33,7 +33,7 @@ export default function NetworkList() {
   const cards = networkSnapshots.map((it) =>
     (<NetworkCard networkSnapshot={it} key={it.networkId} />))
 
-  return <Grid container spacing={2}>
+  return <Grid container spacing={4} alignItems="stretch" padding='4%' justifyContent='space-evenly'>
     {cards}
-  </Grid>;
+  </Grid >;
 }

@@ -1,6 +1,15 @@
 import { createTheme } from "@mui/material";
+import Colors from './Colors';
 
-const theme = createTheme({
+const base = createTheme({
+  palette: {
+    primary: {
+      main: Colors.primary,
+    }
+  },
+  shape: {
+    borderRadius: 20,
+  },
   typography: {
     fontFamily: 'Sora',
     textAlign: 'center',
@@ -17,6 +26,11 @@ const theme = createTheme({
       fontWeight: 'bold',
     },
   },
+})
+
+
+
+const theme = createTheme(base, {
   components: {
     MuiTypography: {
       defaultProps: {
@@ -30,12 +44,17 @@ const theme = createTheme({
       styleOverrides:
       {
         root: {
-          transition: '0.1s',
+          transition: '0.5s',
           ":hover": {
-            border: '1px solid #1976d2',
-            color: '#1976d2',
+            border: `1px solid ${Colors.primary}`,
+            color: Colors.primary,
           }
         }
+      }
+    },
+    MuiButton: {
+      defaultProps: {
+        variant: 'contained',
       }
     },
   }

@@ -1,4 +1,4 @@
-import { Button, Card, Grid, Typography } from '@mui/material';
+import { Button, Card, Grid, Stack, Typography } from '@mui/material';
 import { get, getDatabase, onValue, ref } from 'firebase/database';
 import React from 'react';
 import AddDeviceDialog from './AddDeviceDialog';
@@ -34,20 +34,20 @@ export default function NetworkCard({ networkSnapshot }: { networkSnapshot: Netw
     })
   }, [networkSnapshot])
 
-  return <Grid item md={6}>
-    <Card sx={{ padding: '5%' }}>
+  return <Grid item md={6} xs={12}>
+    <Card sx={{ height: '100%', padding: '50px' }}>
       {networkData && <AddDeviceDialog open={open} setOpen={setOpen} networkData={networkData} />}
-      {networkData && <>
+      {networkData && <Stack gap='40px' alignItems='center' justifyContent='space-between' height='100%'>
         <Typography variant='h4'>
           {networkData.name}
         </Typography>
-        <Typography variant='body1'>
-          {networkData.refresh_token}
+        <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
+          {networkData.network_id}
         </Typography>
         <Button onClick={() => setOpen(true)}>
           Add device
         </Button>
-      </>}
+      </Stack>}
     </Card>
   </Grid>;
 }

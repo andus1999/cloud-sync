@@ -10,6 +10,7 @@ import Layout from '../components/Layout'
 import Loading from '../components/Loading'
 import { getDatabase, ref, set, update } from "firebase/database";
 import Header from '../components/Header'
+import Footer from '../components/Footer'
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhyAj4xZoz36pX5Fm4g-a8PnazteInyRQ",
@@ -52,6 +53,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         {user === null && <LoginScreen />}
         {user === undefined && <Loading />}
       </Layout>
+      <Footer />
     </ThemeProvider>
   )
 }

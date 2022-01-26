@@ -62,15 +62,15 @@ export default function CreateNetworkDialog({ open, setOpen }: { open: boolean, 
         <DialogContent>
           <Stack gap='40px'>
             {success ? <Alert severity='success'>
-              Successfully created a new Networt!
+              {`Successfully created ${networkName}!`}
             </Alert> :
               <Alert severity='info'>
                 Please enter a name for the new network
               </Alert>}
-            <TextField
+            {!success && <TextField
               label="Network name"
               onChange={(e) => setNetworkName(e.target.value)}
-            />
+            />}
             {loading && <Stack alignItems='center'>
               <CircularProgress />
             </Stack>}
