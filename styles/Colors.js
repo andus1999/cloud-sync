@@ -1,8 +1,8 @@
-import { lime, blue } from "@mui/material/colors";
+import { lime, purple, pink } from "@mui/material/colors";
 
 
 const Colors = {
-  primary: blue['A700'],
+  primary: pink[500],
 };
 
 export default Colors;

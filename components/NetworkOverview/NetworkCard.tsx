@@ -44,7 +44,7 @@ export default function NetworkCard({ networkSnapshot }: { networkSnapshot: Netw
         <Typography variant='body1' sx={{ wordBreak: 'break-word' }}>
           {networkData.network_id}
         </Typography>
-        <Button onClick={() => setOpen(true)}>
+        <Button onClick={() => setOpen(true)} sx={{ width: '100%' }}>
           Add device
         </Button>
       </Stack>}

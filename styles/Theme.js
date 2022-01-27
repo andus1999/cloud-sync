@@ -39,7 +39,7 @@ const theme = createTheme(base, {
     },
     MuiCard: {
       defaultProps: {
-        variant: 'outlined'
+        variant: 'outlined',
       },
       styleOverrides:
       {
