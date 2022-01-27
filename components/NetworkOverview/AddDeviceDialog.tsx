@@ -29,7 +29,7 @@ export default function AddDeviceDialog({ open, setOpen, networkData }:
     let timeout: any;
 
     const putNetworkInformation = async () => {
-      const res = await fetch("http://172.16.0.1/network-information", {
+      const res = await fetch("https://172.16.0.1/network-information", {
         method: 'PUT',
         body: networkData.network_id + ',' + networkData.refresh_token,
       });
@@ -59,7 +59,7 @@ export default function AddDeviceDialog({ open, setOpen, networkData }:
       while (!canceled) {
         let res: Response;
         try {
-          res = await fetch("http://172.16.0.1/success");
+          res = await fetch("https://172.16.0.1/success");
         } catch {
           await new Promise(r => setTimeout(r, 1000));
           continue;
@@ -107,7 +107,7 @@ export default function AddDeviceDialog({ open, setOpen, networkData }:
   const sendCredentials = async () => {
     setError("");
     setStepInternal("send_credentials");
-    const res = await fetch('http://172.16.0.1/credentials', {
+    const res = await fetch('https://172.16.0.1/credentials', {
       method: 'PUT',
       body: ssid + ',' + pass
     });
