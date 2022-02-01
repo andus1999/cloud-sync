@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider, Fab, Stack, Typography } from '@mui/material';
+import { CircularProgress, Divider, Fab, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import NetworkList from './NetworkList';
 import CreateNetworkDialog from './CreateNetworkDialog';
