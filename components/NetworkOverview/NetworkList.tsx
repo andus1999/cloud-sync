@@ -10,30 +10,29 @@ export default function NetworkList() {
   React.useEffect(() => {
     const auth = getAuth();
     const database = getDatabase();
-    const getPermissions = () => {
-      const networksRef = ref(database, 'users/' + auth.currentUser?.uid + '/networks');
-      onValue(networksRef, (snapshot) => {
-        if (snapshot.exists()) {
-          const p: Array<NetworkSnapshot> = [];
-          for (const [key, v] of Object.entries(snapshot.val())) {
-            const value = v as any;
-            p.push({ networkId: key, permissions: value?.permissions });
-          }
-          setNetworkSnapshots(p);
-          console.log(p);
-        } else {
-          console.log("No data available");
+    const networksRef = ref(database, 'users/' + auth.currentUser?.uid + '/networks');
+    const unsub = onValue(networksRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const p: Array<NetworkSnapshot> = [];
+        for (const [key, v] of Object.entries(snapshot.val())) {
+          const value = v as any;
+          p.push({ networkId: key, permissions: value?.permissions });
         }
-      });
-    }
-    getPermissions();
+        setNetworkSnapshots(p);
+        console.log(p);
+      } else {
+        setNetworkSnapshots([]);
+        console.log("No data available");
+      }
+    });
+    return () => unsub();
   }, [])
 
 
   const cards = networkSnapshots.map((it) =>
     (<NetworkCard networkSnapshot={it} key={it.networkId} />))
 
-  return <Grid container spacing={4} alignItems="stretch" padding='4%' justifyContent='space-evenly'>
+  return <Grid container spacing={2} alignItems="stretch" padding='0 3%'>
     {cards}
   </Grid >;
 }

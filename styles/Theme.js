@@ -25,6 +25,9 @@ const base = createTheme({
     h4: {
       fontWeight: 'bold',
     },
+    h5: {
+      fontWeight: 'bold',
+    }
   },
 })
 
@@ -32,11 +35,6 @@ const base = createTheme({
 
 const theme = createTheme(base, {
   components: {
-    MuiTypography: {
-      defaultProps: {
-        textAlign: 'center',
-      }
-    },
     MuiCard: {
       defaultProps: {
         variant: 'outlined',
@@ -57,6 +55,22 @@ const theme = createTheme(base, {
         variant: 'contained',
       }
     },
+    MuiListItemIcon: {
+      styleOverrides:
+      {
+        root: {
+          color: Colors.colorOnSurface,
+        }
+      }
+    },
+    MuiIconButton: {
+      styleOverrides:
+      {
+        root: {
+          color: Colors.colorOnSurface,
+        }
+      }
+    }
   }
 });
 

@@ -40,8 +40,8 @@ export default function CreateNetworkDialog({ open, setOpen }: { open: boolean, 
           ref(db, 'users/' + auth.currentUser?.uid + '/networks/' + nUid + '/permissions'),
           'admin');
         set(
-          ref(db, 'networks/' + nUid),
-          { name: networkName, refresh_token: rToken });
+          ref(db, 'networks/' + nUid + '/info'),
+          { name: networkName, refresh_token: rToken, email, password });
         setLoading(false);
         setSuccess(true);
       })
@@ -53,6 +53,10 @@ export default function CreateNetworkDialog({ open, setOpen }: { open: boolean, 
 
   const handleClose = () => {
     setOpen(false);
+    setNetworkName("");
+    setError("");
+    setLoading(false);
+    setSuccess(false);
   };
 
   return <div>

@@ -3,14 +3,15 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Theme from '../styles/Theme'
 import { ThemeProvider } from '@mui/material'
-import { FirebaseOptions, initializeApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import LoginScreen from './LoginScreen'
+import LoginScreen from './login'
 import Layout from '../components/Layout'
 import Loading from '../components/Loading'
 import { getDatabase, ref, set, update } from "firebase/database";
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import SideBar from '../components/SideBar'
 
 const firebaseConfig = {
   apiKey: "AIzaSyAhyAj4xZoz36pX5Fm4g-a8PnazteInyRQ",
@@ -34,7 +35,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     onAuthStateChanged(auth, (u) => {
       if (u) {
         const uid = u.uid;
-        if (!user) update(ref(database, 'users/' + uid), {
+        update(ref(database, 'users/' + uid), {
           email: u.email,
         });
         setUser(u);
@@ -42,17 +43,18 @@ function MyApp({ Component, pageProps }: AppProps) {
         setUser(null);
       }
     });
-  }, [user])
+  }, [])
 
 
   return (
     <ThemeProvider theme={Theme}>
       {user && <Header />}
-      <Layout>
+      {user && <SideBar />}
+      <Layout user>
         {user && <Component {...pageProps} />}
-        {user === null && <LoginScreen />}
-        {user === undefined && <Loading />}
       </Layout>
+      {user === null && <LoginScreen />}
+      {user === undefined && <Loading />}
       <Footer />
     </ThemeProvider>
   )

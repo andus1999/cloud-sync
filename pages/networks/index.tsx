@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
-import NetworkOverview from '../components/NetworkOverview'
+import NetworkOverview from '../../components/NetworkOverview'
 import styles from '../styles/Home.module.css'
 
 const Home: NextPage = () => {

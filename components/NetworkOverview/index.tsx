@@ -15,16 +15,16 @@ export default function NetworkOverview() {
   return <div>
     <CreateNetworkDialog open={open} setOpen={setOpen} />
     <Stack gap='50px' alignItems='center'>
-      <Stack direction='row' gap='20px' alignItems='center'>
+
+      <Stack direction='row' gap='40px' alignItems='center' padding='0 3%'>
         <CloudIcon fontSize='large' />
-        <Typography variant='h3'>
+        <Typography variant='h4'>
           Networks
         </Typography>
       </Stack>
 
-      <Divider sx={{ width: '50%' }} />
       <NetworkList />
-      <Stack width='100%' alignItems='flex-end'>
+      <Stack width='100%' alignItems='flex-end' padding='0 3%'>
         <Fab color="primary" aria-label="add" onClick={createNewNetwork}>
           <AddIcon />
         </Fab>
