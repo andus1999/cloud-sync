@@ -1,11 +1,13 @@
-import { lime, purple, pink } from "@mui/material/colors";
+import { lime, purple, pink, green } from "@mui/material/colors";
 
 
 const Colors = {
   primary: pink[500],
-  colorOnPrimary: 'white',
-  colorOnSurface: 'black',
+  onPrimary: 'white',
+  onSurface: 'black',
   surface: 'white',
+  success: green[500],
+  error: pink[500],
 };
 
 export default Colors;

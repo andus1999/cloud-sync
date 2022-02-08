@@ -1,7 +1,7 @@
 import { Divider, Stack, Typography } from '@mui/material';
 import React from 'react';
 import Colors from '../../styles/Colors';
-import Values from '../../styles/Values';
+import Values from '../../resources/Values';
 
 export default function Footer() {
   return <>

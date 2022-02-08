@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
 import React from 'react';
-import Values from '../../styles/Values';
+import Values from '../../resources/Values';
 
 export default function Layout(props: any) {
   return <>

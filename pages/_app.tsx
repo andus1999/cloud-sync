@@ -49,7 +49,6 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={Theme}>
       {user && <Header />}
-      {user && <SideBar />}
       <Layout user>
         {user && <Component {...pageProps} />}
       </Layout>

@@ -1,4 +1,4 @@
-import { Button, Card, Grid, ListItemIcon, ListItemText, Stack, Typography, List, Switch, ListItem, IconButton } from '@mui/material';
+import { Button, Card, Grid, ListItemIcon, ListItemText, Divider, Stack, Typography, List, Switch, ListItem, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
 import { get, getDatabase, onValue, ref, remove, set } from 'firebase/database';
 import React from 'react';
 import AddDeviceDialog from './AddDeviceDialog';
@@ -9,6 +9,8 @@ import Link from 'next/link';
 import { deleteUser, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { useRouter } from 'next/router';
+import EditIcon from '@mui/icons-material/Edit';
+import SecurityIcon from '@mui/icons-material/Security';
 
 const config = {
   apiKey: "AIzaSyAhyAj4xZoz36pX5Fm4g-a8PnazteInyRQ",
@@ -33,6 +35,8 @@ export interface NetworkSnapshot {
 export default function NetworkCard({ networkSnapshot }: { networkSnapshot: NetworkSnapshot }) {
   const [networkInfo, setNetworkInfo] = React.useState<NetworkInfo | null>(null);
   const [open, setOpen] = React.useState(false);
+  const [name, setName] = React.useState("");
+  const [renameOpen, setRenameOpen] = React.useState(false);
 
   const router = useRouter();
   const db = getDatabase();
@@ -75,27 +79,82 @@ export default function NetworkCard({ networkSnapshot }: { networkSnapshot: Netw
     remove(userNetworkRef);
   }
 
-  return <Grid item md={6} xs={12}>
-    <Card sx={{ height: '100%', padding: '50px' }}>
-      {networkInfo && <AddDeviceDialog open={open} setOpen={setOpen} networkInfo={networkInfo} />}
-      {networkInfo && <Stack gap='40px' alignItems='center' justifyContent='space-between' height='100%'>
-        <Stack direction='row' gap='20px' alignItems='center'>
-          <Typography variant='h5'>
-            {networkInfo.name}
-          </Typography>
-          <IconButton onClick={deleteNetwork}>
-            <DeleteIcon />
-          </IconButton>
-        </Stack>
-        <Stack direction='row' gap='10px' flexWrap='wrap' justifyContent='center'>
-          <Button onClick={() => setOpen(true)}>
-            Add device
+  const rename = () => {
+    const nameRef = ref(db, `networks/${networkId}/info/name`)
+    set(nameRef, name);
+    setRenameOpen(false);
+  }
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    name && rename();
+  }
+
+  return <>
+    <Dialog open={renameOpen} onClose={() => setRenameOpen(false)}>
+      <Stack gap='20px' padding='20px' component='form' onSubmit={submit}>
+        <DialogTitle>
+          Rename the Network
+        </DialogTitle>
+        <DialogContent>
+          <Stack gap='10px'>
+            <Typography variant='body1'>
+              {'The current name is ' + networkInfo?.name}
+            </Typography>
+            <TextField
+              label='Network Name'
+              onChange={(e) => setName(e.target.value)}
+            />
+          </Stack>
+
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRenameOpen(false)}>
+            Cancel
           </Button>
-          <Button onClick={() => router.push(`/networks/${networkId}`)}>
-            Dashboard
-          </Button>
-        </Stack>
-      </Stack>}
-    </Card>
-  </Grid>;
+          {name && <Button onClick={rename} type='submit'>
+            Rename
+          </Button>}
+        </DialogActions>
+      </Stack>
+    </Dialog>
+
+    <Grid item md={6} xs={12}>
+      <Card sx={{ height: '100%', padding: '50px' }}>
+        {networkInfo && <AddDeviceDialog open={open} setOpen={setOpen} networkInfo={networkInfo} />}
+        {networkInfo && <Stack gap='20px' justifyContent='space-between' height='100%'>
+          <Stack direction='row' alignItems='center' justifyContent='space-between' width='100%'>
+            <Typography variant='h5' textAlign='left'>
+              {networkInfo.name}
+            </Typography>
+            <Stack direction='row'>
+              <IconButton onClick={() => setRenameOpen(true)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton onClick={deleteNetwork}>
+                <DeleteIcon />
+              </IconButton>
+            </Stack>
+          </Stack>
+          <Divider sx={{ width: '100%' }} />
+          <List>
+            <ListItem>
+              <ListItemIcon>
+                <SecurityIcon />
+              </ListItemIcon>
+              <ListItemText primary='Admin' secondary='You have admin access to this network.' />
+            </ListItem>
+          </List>
+          <Stack direction='row' gap='10px' flexWrap='wrap' justifyContent='right' width='100%'>
+            <Button onClick={() => setOpen(true)}>
+              Add device
+            </Button>
+            <Button onClick={() => router.push(`/networks/${networkId}`)}>
+              Dashboard
+            </Button>
+          </Stack>
+        </Stack>}
+      </Card>
+    </Grid>
+  </>;
 }

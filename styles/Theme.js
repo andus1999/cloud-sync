@@ -38,16 +38,6 @@ const theme = createTheme(base, {
     MuiCard: {
       defaultProps: {
         variant: 'outlined',
-      },
-      styleOverrides:
-      {
-        root: {
-          transition: '0.5s',
-          ":hover": {
-            border: `1px solid ${Colors.primary}`,
-            color: Colors.primary,
-          }
-        }
       }
     },
     MuiButton: {
@@ -59,7 +49,7 @@ const theme = createTheme(base, {
       styleOverrides:
       {
         root: {
-          color: Colors.colorOnSurface,
+          color: Colors.onSurface,
         }
       }
     },
@@ -67,7 +57,7 @@ const theme = createTheme(base, {
       styleOverrides:
       {
         root: {
-          color: Colors.colorOnSurface,
+          color: Colors.onSurface,
         }
       }
     }

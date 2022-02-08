@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, List, ListItemIcon, ListItem, ListItemText, Stack, Divider, Typography, ListItemButton, Box } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings';
-import Values from '../../styles/Values';
+import Values from '../../resources/Values';
 import Colors from '../../styles/Colors';
 import CloudIcon from '@mui/icons-material/Cloud';
 import Link from 'next/link';
@@ -12,15 +12,17 @@ interface MenuItem {
   icon: JSX.Element,
 }
 
-export default function SideBar() {
-
-  const [mobileOpen, setMobileOpen] = React.useState(false);
-
+export default function SideBar({ open, setOpen }: { open: boolean, setOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+    setOpen(!open);
   }
 
   const container = window !== undefined ? () => window.document.body : undefined;
+  onresize = () => {
+    if (innerWidth >= 600)
+      setOpen(false);
+  }
+
 
   const menuItems: Array<MenuItem> = [
     { name: 'Networks', link: '/networks', icon: <CloudIcon /> },
@@ -58,7 +60,7 @@ export default function SideBar() {
     <Drawer
       container={container}
       variant="temporary"
-      open={mobileOpen}
+      open={open}
       onClose={handleDrawerToggle}
       ModalProps={{
         keepMounted: true, // Better open performance on mobile.

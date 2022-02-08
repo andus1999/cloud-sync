@@ -1,13 +1,19 @@
 import React from 'react';
 import { Card, Grid, Typography, Stack, List, ListItem, ListItemIcon, ListItemText, Switch, useButton, Button, Fab } from '@mui/material'
 import { useRouter } from 'next/router';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { getDatabase, increment, onValue, ref, set, update } from 'firebase/database';
 import CloudIcon from '@mui/icons-material/Cloud';
 import DevicesOtherIcon from '@mui/icons-material/DevicesOther';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import AddDeviceDialog from '../NetworkOverview/AddDeviceDialog';
 import AddIcon from '@mui/icons-material/Add';
+import LightSwitch from './DeviceCard/LightSwitch';
+import DeviceCard from './DeviceCard';
+import { deviceNames } from '../../resources/Strings';
+import deviceIcons from './deviceIcons';
+import Values from '../../resources/Values';
+import { Device } from '../../types/interfaces';
 
 
 export interface NetworkInfo {
@@ -20,49 +26,102 @@ export interface NetworkInfo {
 
 export default function NetworkDashboard() {
   const [networkInfo, setNetworkInfo] = React.useState<NetworkInfo | null>(null);
-  const [devices, setDevices] = React.useState<any | null>(null);
-  const router = useRouter();
-  const { networkId } = router.query;
-  const db = getDatabase();
+  const [devices, setDevices] = React.useState<{ [key: string]: Device } | null>(null);
   const [open, setOpen] = React.useState(false);
+
+  const router = useRouter();
+  const networkId = router.query.networkId as string;
+
+
+  React.useEffect(() => {
+    if (!devices) return;
+
+    const requestUpdate = () => {
+      const db = getDatabase();
+      const updates: { [key: string]: object | number } = {}
+      Object.keys(devices).forEach((mac) => {
+        updates[`networks/${networkId}/devices/${mac}/cloud_state/update`] = Math.round(Date.now() / 1000)
+      })
+      update(ref(db), updates);
+    }
+
+    requestUpdate();
+    const interval = setInterval(requestUpdate, 15000);
+    return () => clearInterval(interval);
+
+  }, [devices, networkId])
+
 
   React.useEffect(() => {
     const db = getDatabase();
-    const networkRef = ref(db, 'networks/' + networkId);
+    const networkRef = ref(db, 'networks/' + networkId + '/info');
 
     const unsub = onValue(networkRef, (snapshot) => {
       const val = snapshot.val();
-      setNetworkInfo({ ...val.info, networkId: networkId })
-      setDevices(val.devices)
+      setNetworkInfo({ ...val, networkId: networkId })
     })
-
-    return () => unsub();
+    return unsub;
   }, [networkId])
 
-  const handleToggle = (device: string, key: string) => {
-    const currentValue = devices?.[device]?.cloud_state?.[key];
-    const valueRef = ref(db, `networks/${networkId}/devices/${device}/cloud_state/${key}`);
-    set(valueRef, currentValue != 1 ? 1 : 0);
-  }
 
-  const listItems = devices ? Object.keys(devices).map((it) => (<ListItem key={it}>
+  React.useEffect(() => {
+    const db = getDatabase();
+    const networkRef = ref(db, 'networks/' + networkId + '/devices');
+
+    const unsub = onValue(networkRef, (snapshot) => {
+      const val = snapshot.val();
+      if (!val) return;
+      const d: { [key: string]: Device } = {};
+      Object.keys(val).forEach((mac) => {
+        const data = val[mac];
+        d[mac] = {
+          localState: data.local_state,
+          cloudState: data.cloud_state,
+          info: {
+            ...data.info,
+            networkId,
+            mac,
+          }
+        }
+      })
+      setDevices(d);
+    })
+    return unsub;
+  }, [networkId])
+
+
+
+  const deviceCards = devices ? Object.keys(devices).map((it) => (
+    <DeviceCard key={it} device={devices[it]} />
+  )) : []
+
+  const deviceOnlineCounts: { [key: string]: number } = {}
+  const deviceCounts: { [key: string]: number } = {}
+
+  const numberOfDevices = devices ? Object.keys(devices).length : null
+  let onlineDevices = 0;
+
+  devices && Object.keys(devices).forEach((it) => {
+    const key = devices[it].info.hardware_id
+    deviceCounts[key]
+      ? deviceCounts[key] += 1
+      : deviceCounts[key] = 1;
+    if ((Date.now() / 1000 - devices[it].localState.heartbeat) < Values.heartbeatInterval) {
+      deviceOnlineCounts[key]
+        ? deviceOnlineCounts[key] += 1
+        : deviceOnlineCounts[key] = 1;
+      onlineDevices += 1;
+    }
+  })
+
+  const deviceListItems = Object.keys(deviceCounts).map((it) => <ListItem key={it}>
     <ListItemIcon>
-      {devices[it].local_state?.pin_0 == 1 ? <LightbulbIcon /> : <LightbulbOutlinedIcon />}
+      {deviceIcons[it]}
     </ListItemIcon>
-    <ListItemText primary="Led" />
-    <Switch
-      edge="end"
-      onChange={() => handleToggle(it, 'pin_0')}
-      checked={devices[it]?.cloud_state?.pin_0 == 1}
-      inputProps={{
-        'aria-labelledby': 'switch-list-label-bluetooth',
-      }}
-    />
-  </ListItem>)) : []
+    <ListItemText primary={`${deviceOnlineCounts[it] || 0} / ${deviceCounts[it]} Online`} secondary={deviceNames[it]} />
+  </ListItem>)
 
-  const numberOfDevices = devices ? Object.keys(devices).length : null;
-  const numberOfLedsWithButton = devices ? Object.keys(devices).filter(
-    (it) => devices[it].device_info.hardware_id == 'led_with_button').length : null;
+
 
   return <>
     {networkInfo && <AddDeviceDialog open={open} setOpen={setOpen} networkInfo={networkInfo} />}
@@ -81,24 +140,21 @@ export default function NetworkDashboard() {
           <Grid item md={6} xs={12}>
             <Card sx={{ padding: '20px', height: '100%' }}>
               <List>
-                {numberOfDevices ? <ListItem>
-                  <ListItemIcon>
-                    <DevicesOtherIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={`Registered devices: ${numberOfDevices}`} />
-                </ListItem>
+                {devices ? <>
+                  <ListItem>
+                    <ListItemIcon>
+                      <DevicesOtherIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={`${onlineDevices} / ${numberOfDevices} Online`} secondary='Registered Devices' />
+                  </ListItem>
+                  {deviceListItems}
+                </>
                   : <ListItem>
                     <ListItemIcon>
                       <DevicesOtherIcon />
                     </ListItemIcon>
                     <ListItemText primary={"No devices added."} />
                   </ListItem>}
-                {numberOfLedsWithButton && <ListItem>
-                  <ListItemIcon>
-                    <LightbulbIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={`Leds with Button: ${numberOfLedsWithButton}`} />
-                </ListItem>}
               </List>
             </Card>
           </Grid>
@@ -107,18 +163,7 @@ export default function NetworkDashboard() {
           Devices
         </Typography>
         <Grid container spacing={2} alignItems="stretch">
-          <Grid item md={6} xs={12}>
-            <Card sx={{ padding: '20px', height: '100%' }}>
-              <List>
-                {listItems.length != 0 ? listItems : <ListItem>
-                  <ListItemIcon>
-                    <DevicesOtherIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={"Add your first device."} />
-                </ListItem>}
-              </List>
-            </Card>
-          </Grid>
+          {deviceCards}
         </Grid>
         <Stack direction='row' alignItems='center' justifyContent='right'>
           <Fab color="primary" aria-label="add" onClick={() => setOpen(true)}>
