@@ -17,7 +17,8 @@ export default function SettingsList() {
     const networkRef = ref(db, `users/${auth.currentUser?.uid}/wifi_networks`);
 
     const deleteNetwork = (name: string) => {
-      remove(networkRef);
+      const nRef = ref(db, `users/${auth.currentUser?.uid}/wifi_networks/${name}`);
+      remove(nRef);
     }
 
     const unsub = onValue(networkRef, (snapshot) => {

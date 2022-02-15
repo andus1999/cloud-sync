@@ -81,7 +81,7 @@ export default function DeviceCard({ device }: { device: Device }) {
           </Stack>
 
           <Divider />
-          {device.info.hardware_id == 'led_with_button'
+          {(device.info.hardware_id == 'led_with_button' || device.info.hardware_id == 'esp8266_light_switch_module')
             && <LightSwitch device={device} />}
         </Stack>
       </Card>
