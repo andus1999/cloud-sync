@@ -3,7 +3,7 @@ import { Grid, Card, Stack, Typography, Divider, Dialog, DialogTitle, DialogCont
 import { deviceNames } from '../../../resources/Strings';
 import LightSwitch from './LightSwitch';
 import { Device } from '../../../types/interfaces';
-import { getDatabase, onValue, ref, set } from 'firebase/database';
+import { getDatabase, onValue, ref, remove, set } from 'firebase/database';
 import EditIcon from '@mui/icons-material/Edit';
 import deviceIcons from '../deviceIcons';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -26,6 +26,18 @@ export default function DeviceCard({ device }: { device: Device }) {
     name && rename();
   }
 
+  const deleteDevice = async () => {
+    const db = getDatabase();
+    const commandRef = ref(db, `networks/${device.info.networkId}/devices/${device.info.mac}/cloud_state/command`)
+    await set(commandRef, "disconnect");
+    onValue(commandRef, (snapshot) => {
+      console.log(snapshot.val())
+      if (snapshot.val() == 0) {
+        remove(ref(db, `networks/${device.info.networkId}/devices/${device.info.mac}`))
+        setOpen(false);
+      }
+    })
+  }
 
   const deviceName = device.info.name || deviceNames[device.info.hardware_id];
 
@@ -33,12 +45,19 @@ export default function DeviceCard({ device }: { device: Device }) {
     <Dialog open={open} onClose={() => setOpen(false)}>
       <Stack gap='20px' padding='20px' component='form' onSubmit={submit}>
         <DialogTitle>
-          Rename the Device
+          Device Settings
         </DialogTitle>
 
         <DialogContent>
           <Stack gap='10px'>
-            <Typography variant='body1'>
+            <Button
+              onClick={deleteDevice}
+              sx={{ marginBottom: '20px' }}
+            >Delete from Network</Button>
+            <Typography variant='h6'>
+              Rename the device
+            </Typography>
+            <Typography variant='body2'>
               {'The current name is ' + deviceName}
             </Typography>
             <TextField

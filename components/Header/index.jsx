@@ -33,7 +33,7 @@ export default function Header() {
         marginLeft: { xs: 0, sm: Values.drawerWidth },
         width: { xs: '100%', sm: `calc(100% - ${Values.drawerWidth})` },
       }}>
-      <Stack direction='row' justifyContent='space-between' alignItems='center' width='100%' padding='0 20px'>
+      <Stack direction='row' justifyContent='space-between' alignItems='center' padding='0 20px' width='100%' maxWidth='1200px'>
         <IconButton onClick={() => setSideBarOpen(!sideBarOpen)} sx={{
           display: { xs: 'block', sm: 'none' },
         }}>
@@ -41,11 +41,10 @@ export default function Header() {
         </IconButton>
         <Stack
           direction='row'
-          justifyContent='right'
-          width='100%'
-          maxWidth='1100px'
           alignItems='center'
           height='80px'
+          width='100%'
+          justifyContent='right'
           gap='30px'>
           <Stack direction='row' gap='10px' alignItems='center'>
             <div style={{ margin: '0 0 4px' }}>

@@ -74,6 +74,7 @@ export default function NetworkDashboard() {
       const d: { [key: string]: Device } = {};
       Object.keys(val).forEach((mac) => {
         const data = val[mac];
+        if (!data.info) return
         d[mac] = {
           localState: data.local_state,
           cloudState: data.cloud_state,
@@ -106,7 +107,7 @@ export default function NetworkDashboard() {
     deviceCounts[key]
       ? deviceCounts[key] += 1
       : deviceCounts[key] = 1;
-    if ((Date.now() / 1000 - devices[it].localState.heartbeat) < Values.heartbeatInterval) {
+    if ((Date.now() / 1000 - devices[it]?.localState?.heartbeat) < Values.heartbeatInterval) {
       deviceOnlineCounts[key]
         ? deviceOnlineCounts[key] += 1
         : deviceOnlineCounts[key] = 1;
