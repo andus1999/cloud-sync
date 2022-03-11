@@ -38,6 +38,7 @@ export default function NetworkDashboard() {
     if (!devices) return;
 
     const requestUpdate = () => {
+      console.log('Pinging devices')
       const db = getDatabase();
       const updates: { [key: string]: object | number } = {}
       Object.keys(devices).forEach((mac) => {
