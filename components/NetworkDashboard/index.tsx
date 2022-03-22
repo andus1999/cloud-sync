@@ -27,7 +27,6 @@ export interface NetworkInfo {
 export default function NetworkDashboard() {
   const [networkInfo, setNetworkInfo] = React.useState<NetworkInfo | null>(null);
   const [devices, setDevices] = React.useState<{ [key: string]: Device } | null>(null);
-  const [firstUpdate, setFirstUpdate] = React.useState(true);
   const [open, setOpen] = React.useState(false);
 
   const router = useRouter();
@@ -42,22 +41,19 @@ export default function NetworkDashboard() {
       const db = getDatabase();
       const updates: { [key: string]: object | number } = {}
       Object.keys(devices).forEach((mac) => {
-        if ((Date.now() / 1000 - devices[mac]?.localState?.heartbeat) > 5) {
+        if ((Date.now() / 1000 - devices[mac]?.cloudState?.update) > 2) {
           updates[`networks/${networkId}/devices/${mac}/cloud_state/update`] = Math.round(Date.now() / 1000)
         }
       })
       update(ref(db), updates);
     }
 
-    if (firstUpdate) {
-      requestUpdate();
-      setFirstUpdate(false);
-    }
+    requestUpdate();
 
     const interval = setInterval(requestUpdate, 15000);
     return () => clearInterval(interval);
 
-  }, [devices, networkId, firstUpdate])
+  }, [devices, networkId])
 
 
   React.useEffect(() => {
